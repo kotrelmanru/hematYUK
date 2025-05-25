@@ -1,3 +1,4 @@
+// index.js
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -12,6 +13,15 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 
 const app = express();
 
+// ─── 0️⃣ URL NORMALIZATION ─────────────────────────────────────────────────────────
+// Strip any trailing commas or semicolons from the requested path so Express
+// doesn’t try to interpret "/favicon.ico," (or "/,") as a broken route pattern.
+app.use((req, res, next) => {
+  // If you need other punctuation, add to the character class.
+  req.url = req.url.replace(/[\.,;]+$/, "");
+  next();
+});
+
 // ─── 1️⃣ CORS ──────────────────────────────────────────────────────────────────────
 app.use(
   cors({
@@ -24,9 +34,8 @@ app.use(
 app.options("*", cors()); // explicit preflight
 
 // ─── 2️⃣ FAVICON & STATIC FILES ────────────────────────────────────────────────────
-// Serve favicon from public/favicon.png
+// Make sure you have `public/favicon.png` and any other assets in `public/`:
 app.use(favicon(path.join(__dirname, "public", "favicon.png")));
-// Serve all other static assets (CSS, JS, images) from public/
 app.use(express.static(path.join(__dirname, "public")));
 
 // ─── 3️⃣ BODY PARSER ───────────────────────────────────────────────────────────────
@@ -42,7 +51,6 @@ app.use("/api/v1/expense", expenseRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
 
 // ─── 6️⃣ FALLBACK FOR UNHANDLED ROUTES ────────────────────────────────────────────
-// This ensures requests like "/favicon.png," or any typo don’t crash Express
 app.all("*", (req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
