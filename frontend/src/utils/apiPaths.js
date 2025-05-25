@@ -1,5 +1,4 @@
-// Ambil BASE_URL langsung dari import.meta.env tanpa string literal yang salah
-export const BASE_URL = import.meta.env.VITE_REACT_APP_BACKEND_BASEURL;
+export const BASE_URL = "http://localhost:8000";
 
 //utils/apiPaths.js
 export const API_PATHS = {
